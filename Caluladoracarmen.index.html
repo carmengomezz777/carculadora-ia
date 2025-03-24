@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora Científica</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-image: url('https://i.postimg.cc/htQGN5kx/xinyi-wen-qj-CHPZbe-XCQ-unsplash.jpg'); /* Nueva imagen de fondo */
+            background-size: cover;
+            background-position: center;
+            font-family: Arial, sans-serif;
+            overflow: hidden; /* Ocultar desbordamiento para los efectos */
+            position: relative;
+        }
+        .calculator {
+            background-color: rgba(255, 255, 255, 0.8); /* Fondo semi-transparente */
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0px 0px 12px rgba(0, 0, 0, 0.2);
+            width: 500px; /* Tamaño más grande */
+            position: relative;
+            display: flex;
+            flex-direction: row;
+            z-index: 3; /* Asegurar que la calculadora esté sobre los efectos */
+            border: 2px solid #ff69b4; /* Borde neon */
+            box-shadow: 0 0 20px #ff69b4, 0 0 40px #ff1493, 0 0 60px #ba55d3; /* Efecto de neón */
+        }
+        .brand {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(145deg, #ff69b4, #ff1493);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: bold;
+            text-shadow: 0px 0px 5px rgba(255, 255, 255, 0.7);
+            box-shadow: 0px 0px 8px rgba(255, 255, 255, 0.5);
+            margin-bottom: 20px;
+            width: 100%;
+        }
+        .main-section {
+            display: flex;
+            flex-direction: column;
+            width: 70%; /* Más ancho para la sección principal */
+            position: relative; /* Para posicionar las luces */
+        }
+        .right-screen {
+            width: 25%; /* Pantalla lateral más pequeña */
+            height: 420px; /* Altura fija ajustada para ser más larga */
+            background-color: #ba55d3; /* Rosa oscuro */
+            border-radius: 12px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between; /* Distribuir elementos uniformemente */
+            align-items: center;
+            margin-left: 30px; /* Más separación entre las pantallas */
+            border: 2px solid #ff69b4; /* Borde neon */
+            box-shadow: 0 0 15px #ff69b4, 0 0 30px #ff1493; /* Efecto de neón */
+        }
+        .calculator input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            text-align: right;
+            background-color: #ba55d3; /* Rosa oscuro */
+            color: white;
+            height: 35px;
+            border: 2px solid #ff69b4; /* Borde neon */
+            box-shadow: 0 0 10px #ff69b4, 0 0 20px #ff1493; /* Efecto de neón */
+        }
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+        }
+        .buttons button {
+            padding: 12px;
+            font-size: 14px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            background-color: rgba(255, 192, 203, 0.5); /* Rosa claro más transparente */
+            color: #fff;
+            transition: background-color 0.3s, box-shadow 0.3s, transform 0.3s;
+            box-shadow: 0 0 15px rgba(255, 105, 180, 0.5); /* Brillo inicial más suave */
+            user-select: none; /* Evitar selección de texto */
+            outline: none; /* Eliminar contorno al hacer clic */
+            position: relative;
+            overflow: hidden;
+        }
+        .buttons button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 105, 180, 0.7);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.4s ease, height 0.4s ease;
+        }
+        .buttons button:hover::before {
+            width: 150px;
+            height: 150px;
+        }
+        .buttons button.operator {
+            background-color: rgba(255, 105, 180, 0.7); /* Rosa medio más transparente */
+        }
+        .buttons button.equal {
+            background-color: rgba(219, 112, 147, 0.7); /* Rosa fuerte más transparente */
+            grid-column: span 2;
+        }
+        .buttons button.scientific {
+            background-color: rgba(221, 160, 221, 0.5); /* Rosa pálido más transparente */
+        }
+        /* Efecto de fuegos artificiales en toda la pantalla */
+        .fireworks {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 1; /* Colocar detrás de la calculadora */
+        }
+        .firework {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-color: rgba(255, 105, 180, 0.7); /* Rosa con transparencia */
+            border-radius: 50%;
+            opacity: 0;
+            animation: explode 1.5s ease-out forwards;
+        }
+        /* Efecto de luces lilas alrededor de la pantalla */
+        .lilac-lights {
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            width: calc(100% + 20px);
+            height: calc(100% + 20px);
+            pointer-events: none;
+            display: none; /* Ocultar por defecto */
+            overflow: hidden;
+        }
+        .lilac-light {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background-color: rgba(147, 112, 219, 0.7); /* Lila con transparencia */
+            border-radius: 50%;
+            opacity: 0;
+            animation: blink 1.5s infinite alternate;
+        }
+        /* Animaciones adicionales */
+        @keyframes explode {
+            0% {
+                transform: scale(0);
+                opacity: 0.7;
+            }
+            100% {
+                transform: scale(3);
+                opacity: 0;
+            }
+        }
+        @keyframes blink {
+            0% {
+                opacity: 0.3;
+                transform: scale(1);
+            }
+            100% {
+                opacity: 0.7;
+                transform: scale(1.5);
+            }
+        }
+        @keyframes button-hover {
+            0% {
+                transform: scale(1);
+            }
+            100% {
+                transform: scale(1.1);
+            }
+        }
+        .buttons button:hover {
+            animation: button-hover 0.3s ease-in-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="fireworks" id="fireworks"></div> <!-- Contenedor global para fuegos artificiales -->
+    <div class="calculator">
+        <div class="main-section">
+            <div class="brand">Carmen Gómez González</div>
+            <input type="text" id="display" disabled>
+            <div class="lilac-lights" id="lilacLights"></div> <!-- Luces lilas -->
+            <div class="buttons">
+                <!-- Fila 1: Funciones científicas -->
+                <button onclick="applyFunction('sin()')" class="scientific">sin</button>
+                <button onclick="applyFunction('cos()')" class="scientific">cos</button>
+                <button onclick="applyFunction('tan()')" class="scientific">tan</button>
+                <button onclick="applyFunction('sqrt()')" class="scientific">√</button>
+                <!-- Fila 2: Más funciones científicas -->
+                <button onclick="applyFunction('pow(,2)')" class="scientific">x²</button>
+                <button onclick="applyFunction('pow(,3)')" class="scientific">x³</button>
+                <button onclick="applyFunction('pow(,)')" class="scientific">xʸ</button>
+                <button onclick="applyFunction('log()')" class="scientific">log</button>
+                <!-- Fila 3: Números y operadores básicos -->
+                <button onclick="appendNumber('7')">7</button>
+                <button onclick="appendNumber('8')">8</button>
+                <button onclick="appendNumber('9')">9</button>
+                <button onclick="appendOperator('/')" class="operator">/</button>
+                <!-- Fila 4: Números y operadores básicos -->
+                <button onclick="appendNumber('4')">4</button>
+                <button onclick="appendNumber('5')">5</button>
+                <button onclick="appendNumber('6')">6</button>
+                <button onclick="appendOperator('*')" class="operator">*</button>
+                <!-- Fila 5: Números y operadores básicos -->
+                <button onclick="appendNumber('1')">1</button>
+                <button onclick="appendNumber('2')">2</button>
+                <button onclick="appendNumber('3')">3</button>
+                <button onclick="appendOperator('-')" class="operator">-</button>
+                <!-- Fila 6: Números y operadores básicos -->
+                <button onclick="appendNumber('0')" style="grid-column: span 2;">0</button>
+                <button onclick="appendNumber('.')">.</button>
+                <button onclick="appendOperator('+')" class="operator">+</button>
+                <!-- Fila 7: Acciones adicionales -->
+                <button onclick="clearDisplay()">C</button>
+                <button onclick="deleteLast()" class="operator">←</button>
+                <button onclick="calculateResult()" class="equal">=</button>
+            </div>
+        </div>
+        <div class="right-screen">
+            <input type="text" id="secondary-display" disabled>
+            <div style="font-size: 12px; color: white; text-align: center;">
+                Pantalla secundaria
+            </div>
+        </div>
+    </div>
+    <script>
+        const display = document.getElementById('display');
+        const secondaryDisplay = document.getElementById('secondary-display');
+        const fireworksContainer = document.getElementById('fireworks');
+        const lilacLightsContainer = document.getElementById('lilacLights');
+
+        // Crear luces lilas alrededor de la pantalla
+        function createLilacLights() {
+            for (let i = 0; i < 50; i++) { // Crear 50 luces lilas
+                const light = document.createElement('div');
+                light.classList.add('lilac-light');
+                light.style.top = `${Math.random() * 100}%`;
+                light.style.left = `${Math.random() * 100}%`;
+                lilacLightsContainer.appendChild(light);
+            }
+            lilacLightsContainer.style.display = 'block'; // Mostrar luces lilas
+        }
+
+        // Limpiar luces lilas
+        function clearLilacLights() {
+            lilacLightsContainer.innerHTML = ''; // Limpiar luces lilas
+            lilacLightsContainer.style.display = 'none'; // Ocultar luces lilas
+        }
+
+        // Crear fuegos artificiales en toda la pantalla
+        function triggerFireworks() {
+            for (let i = 0; i < 100; i++) { // Crear 100 fuegos artificiales
+                setTimeout(() => {
+                    createFirework();
+                }, i * 50); // Retraso incremental
+            }
+        }
+
+        function createFirework() {
+            const firework = document.createElement('div');
+            firework.classList.add('firework');
+            firework.style.top = `${Math.random() * 100}vh`;
+            firework.style.left = `${Math.random() * 100}vw`;
+            firework.style.backgroundColor = getRandomColor(); // Colores variados
+            fireworksContainer.appendChild(firework);
+            setTimeout(() => {
+                firework.remove(); // Eliminar el fuego artificial después de la animación
+            }, 1500);
+        }
+
+        function appendNumber(value) {
+            display.value += value;
+        }
+
+        function appendOperator(operator) {
+            display.value += operator;
+        }
+
+        function applyFunction(func) {
+            display.value = func.replace('()', `(${display.value})`);
+        }
+
+        function calculateResult() {
+            try {
+                const result = eval(display.value);
+                secondaryDisplay.value = display.value + ' =';
+                display.value = result;
+                triggerFireworks();
+                createLilacLights();
+            } catch (error) {
+                display.value = 'Error';
+            }
+        }
+
+        function clearDisplay() {
+            display.value = '';
+            secondaryDisplay.value = '';
+            clearLilacLights();
+        }
+
+        function deleteLast() {
+            display.value = display.value.slice(0, -1);
+        }
+
+        function getRandomColor() {
+            const colors = ['rgba(255, 105, 180, 0.7)', 'rgba(255, 20, 147, 0.7)', 'rgba(186, 85, 211, 0.7)', 'rgba(221, 160, 221, 0.7)', 'rgba(147, 112, 219, 0.7)'];
+            return colors[Math.floor(Math.random() * colors.length)];
+        }
+    </script>
+</body>
+</html>
